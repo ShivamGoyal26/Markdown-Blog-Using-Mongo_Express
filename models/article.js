@@ -1,6 +1,11 @@
 const mongoose = require("mongoose")
 const marked = require('marked')
 const slugify = require('slugify')
+const createDomPurify = require('dompurify')
+const { JSDOM } = require('jsdom')
+
+// So this dompurifier allows us to create html and purify by using this JSDOM Window object
+const dompurify = createDomPurify(new JSDOM().window)
 
 const articleSchema = new mongoose.Schema({
     title: {
@@ -22,6 +27,10 @@ const articleSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true
+    },
+    sanitizedHtml: {
+        type: String,
+        required: true
     }
 })
 
@@ -34,6 +43,13 @@ articleSchema.pre('validate', function (next) {
             strict: true
         })
     }
+
+    if (this.markdown) {
+        // Here we are converting the markdown content into the html using the marked and then we are santizing it using the dompurify.sanitize()
+        // Purify in the senese it helps us to get rid of any macilious code that could be possibly in there
+        this.sanitizedHtml = dompurify.sanitize(marked(this.markdown))
+    }
+
     next()
 })
 
