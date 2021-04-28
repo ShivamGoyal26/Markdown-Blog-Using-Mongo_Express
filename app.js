@@ -4,8 +4,13 @@ const mongoose = require('mongoose')
 const Article = require('./models/article')
 const articleRouter = require('./routes/articles')
 const methodOverride = require('method-override')
+const dotenv = require("dotenv")
 
-mongoose.connect('mongodb+srv://shivam:shivam@cluster0.yit7s.mongodb.net/shivam?retryWrites=true&w=majority', {
+dotenv.config({ path: './config.env' })
+
+const DB = process.env.DATABASE
+
+mongoose.connect(DB, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
